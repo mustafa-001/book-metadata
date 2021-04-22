@@ -1,0 +1,31 @@
+add_executable(book-metadata main.cpp pdf.cpp djvu.cpp epub.cpp book)
+# add_executable(book-metadata main.cpp pdf.cpp djvu.cpp book) #epub dolayısıyçla glib yok
+# set(podofo_dependencies "pthread png tiff z freetype jpeg ssl cyrpto fontconfig expat" )
+
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+# INCLUDE_DIRECTORIES(${LIBPODOFO_H})
+
+# # FIND_PACKAGE(LIBPODOFO REQUIRED)
+# # IF(NOT LIBPODOFO_FOUND)
+# 	MESSAGE("+++PoDoFo not found... building private copy")
+# 	# SET(PODOFO_BUILD_STATIC 1)
+# 	# SET(PODOFO_BUILD_SHARED 0)
+# 	# SET(PODOFO_BUILD_LIB_ONLY 1)
+# 	# ADD_SUBDIRECTORY(externals/required_libpodofo)
+# 	# SET(LIBPODOFO_H ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/podofo-0.9.6)
+# 	# SET(LIBPODOFO_CONFIG_H ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/podofo-0.9.6)
+# 	# SET(LIBPODOFO_LIB podofo_static)
+# 	MESSAGE("+++Done setting up private PoDoFo copy")
+# # ENDIF(NOT LIBPODOFO_FOUND)
+# # target_link_libraries(epub z expat zip)
+# # target_include_directories(book-metadata PUBLIC /usr/include/c++/9/)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(XMLPP REQUIRED libxml++-2.6)
+
+target_include_directories(book-metadata PUBLIC ${XMLPP_INCLUDE_DIRS})
+add_definitions(-DHAVE_PTHREAD -DHAVE_STDINT_H -DHAS_MBSTATE -DHAVE_NAMESPACES)
+
+target_link_libraries(book-metadata ${XMLPP_LIBRARIES})
+target_link_libraries(book-metadata podofo_static)
+target_link_libraries(book-metadata  expat zip z crypto fontconfig ssl jpeg tiff png pthread freetype djvulibre)
+# set_target_properties(book-metadata COMPIL "-fsanitize=address")
