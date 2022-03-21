@@ -1,0 +1,17 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.idea
+/.vs
+/books
+/build
+/cmake-build-debug-mingw
+/cmake-build-debug-visual-studio
+/cmake-build-release-visual-studio
+/out/build/x64-Debug
+/thirdparty/build
+/thirdparty/djvulibre-3.5.28/debian
+/.vscode
+/thirdparty/CMakeFiles
+/thirdparty/djvulibre-3.5.28

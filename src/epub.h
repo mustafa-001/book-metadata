@@ -1,6 +1,6 @@
 #include "book.h"
-#include "libxml++/document.h"
-#include "libxml++/parsers/domparser.h"
+#include "libxml++-5.0/libxml++/document.h"
+#include "libxml++-5.0/libxml++/parsers/domparser.h"
 #include <filesystem>
 #include <string>
 #include <zip.h>

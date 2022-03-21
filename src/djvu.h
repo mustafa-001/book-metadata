@@ -2,7 +2,7 @@
 #define _BMD_DJVU_H
 #include "book.h"
 #include <filesystem>
-#include <libdjvu/DjVuDocEditor.h>
+#include "DjVuDocEditor.h"
 #include <map>
 #include <string>
 #include <vector>

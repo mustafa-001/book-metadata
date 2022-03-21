@@ -42,10 +42,10 @@ void PdfBook::write_to_disk() {
   temp_file.replace_extension("XXXXXX");
   auto* temp_file_path = (char *)malloc(temp_file.string().length());
   strcpy(temp_file_path, temp_file.string().c_str());
-  if (-1 == mkstemp(temp_file_path)) {
-    std::cout << "Error opening a temp file!  " << temp_file << endl;
-    exit(-1);
-  };
+  // if (-1 == _mktemp(temp_file_path)) {
+  //   std::cout << "Error opening a temp file!  " << temp_file << endl;
+  //   exit(-1);
+  // };
   pdf_doc.Write(temp_file_path);
   //Remove the first file we started with.
   if (oldpath.filename() == path.filename()){

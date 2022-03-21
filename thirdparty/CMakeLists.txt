@@ -5,13 +5,29 @@
 # add_subdirectory(XMP-Toolkit-SDK/build)
 # message(status "xmp root ${XMP_ROOT}")
 
-set(PODOFO_BUILD_LIB_ONLY 1)
-set(PODOFO_BUILD_STATIC 1)
-set("FREETYPE_INCLUDE_DIR=${MINGW_PREFIX}/include/freetype2")
-add_subdirectory(podofo-0.9.6)
+# set(PODOFO_BUILD_LIB_ONLY 1)
+# set(PODOFO_BUILD_STATIC 1)
+# set("FREETYPE_INCLUDE_DIR=${MINGW_PREFIX}/include/freetype2")
+# add_subdirectory(podofo-0.9.6)
 
 
-# project(djvulibre)
+# project(djvu)
+add_definitions( -DHAVE_STDINT_H -DHAS_MBSTATE -DHAVE_NAMESPACES)
+file(GLOB DJVU_SRC_FILES djvulibre-3.5.28/libdjvu/*)
+add_library(djvu STATIC  ${DJVU_SRC_FILES})
+target_include_directories(djvu PUBLIC djvulibre-3.5.28/libdjvu )
+# include(ExternalProject)
+# ExternalProject_Add(
+#     djvulibre
+#     PATCH_COMMAND NOCONFIGURE=1 ./autogen.sh
+#     # BUILD_IN_SOURCE 1
+#     CONFIGURE_COMMAND COMMAND ${CFG_CMD} COMMAND ${PATCH_CMD}
+#     BUILD_COMMAND "{make -j4}"
+#     SUBDIRS_FIRST=libdjvu
+#     # skip install
+#     INSTALL_COMMAND ""
+# )
+
 # cmake_minimum_required(VERSION 3.5.1)
 
 
