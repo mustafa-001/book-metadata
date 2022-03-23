@@ -27,7 +27,7 @@ EpubBook::EpubBook(const fs::path& path, bool read_only)
 		flags |= ZIP_RDONLY;
 	}
 	int error_p = 0;
-	epub_file = zip_open((char*)path.generic_u8string().c_str(), flags, &error_p);
+	epub_file = zip_open(reinterpret_cast<const char*>(path.generic_u8string().c_str()), flags, &error_p);
 	if (epub_file == nullptr) {
 		printf("Error while opening epub file: \n");
 		std::exit(-1);
