@@ -47,6 +47,7 @@ void PdfBook::write_to_disk() {
   //   exit(-1);
   // };
   pdf_doc.Write(temp_file_path);
+  pdf_doc.Write(path.c_str());
   //Remove the first file we started with.
   if (oldpath.filename() == path.filename()){
     //remove(oldpath.c_str());

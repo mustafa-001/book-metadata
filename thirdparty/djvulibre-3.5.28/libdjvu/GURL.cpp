@@ -483,6 +483,9 @@ GURL::protocol(const GUTF8String& url)
 {
   const char * const url_ptr=url;
   const char * ptr=url_ptr;
+  if (url == nullptr) {
+      return GUTF8String();
+  }
   for(char c=*ptr;
       c && isascii(c) && (isalnum(c) || c == '+' || c == '-' || c == '.');
       c=*(++ptr)) EMPTY_LOOP;

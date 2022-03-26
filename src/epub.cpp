@@ -1,4 +1,5 @@
 #include "epub.h"
+#include "spdlog/spdlog.h"
 #include "libxml++/attribute.h"
 #include "libxml++/attributenode.h"
 #include "libxml++/nodes/contentnode.h"
@@ -29,29 +30,29 @@ EpubBook::EpubBook(const fs::path& path, bool read_only)
 	int error_p = 0;
 	epub_file = zip_open(reinterpret_cast<const char*>(path.generic_u8string().c_str()), flags, &error_p);
 	if (epub_file == nullptr) {
-		printf("Error while opening epub file: \n");
+		spdlog::error("Error while opening epub file: \n");
 		std::exit(-1);
 	}
 
 	auto* zstat = (zip_stat_t*)malloc(sizeof(zip_stat_t));
 	if (-1 == zip_stat(epub_file, container_xml_path, 0, zstat)) {
-		printf("Error while reading container.xml stats.");
+		spdlog::error("Error while reading container.xml stats.");
 		std::exit(-1);
 	}
 	char* buffer = (char*)malloc(zstat->size);
 	zip_file_t* container_file = zip_fopen(epub_file, container_xml_path, 0);
 	if (container_file == nullptr) {
-		printf("Error while opening container file.");
+		spdlog::error("Error while opening container file.");
 		std::exit(-1);
 	}
 	int read_bytes = zip_fread(container_file, buffer, zstat->size);
 	if (-1 == read_bytes) {
-		printf("Error while reading container.xml file.\n");
+		spdlog::error("Error while reading container.xml file.\n");
 		std::exit(-1);
 	}
 	int e = zip_fclose(container_file);
 	if (e != 0) {
-		printf("Error while closing container.xml file.\n");
+		spdlog::error("Error while closing container.xml file.\n");
 		std::exit(-1);
 	}
 	ns_map = xmlpp::Node::PrefixNsMap{};
@@ -71,18 +72,18 @@ EpubBook::EpubBook(const fs::path& path, bool read_only)
 
 	zstat = (zip_stat_t*)malloc(sizeof(zip_stat_t));
 	if (-1 == zip_stat(epub_file, content_opf_path.string().c_str(), 0, zstat)) {
-		printf("Error while reading opf file stats.");
+		spdlog::error("Error while reading opf file stats.");
 		std::exit(-1);
 	}
 	buffer = (char*)malloc(zstat->size);
 	content_opf_file = zip_fopen(epub_file, content_opf_path.string().c_str(), 0);
 	if (content_opf_file == nullptr) {
-		printf("Error while opening opf file.");
+		spdlog::error("Error while opening opf file.");
 		std::exit(-1);
 	}
 	read_bytes = zip_fread(content_opf_file, buffer, zstat->size);
 	if (-1 == read_bytes) {
-		printf("Error while reading container.xml file.\n");
+		spdlog::error("Error while reading container.xml file.\n");
 		std::exit(-1);
 	}
 
@@ -106,7 +107,7 @@ void EpubBook::set_authors(const std::vector<std::string>& authors) {
 	auto* root = xml_doc->get_root_node();
 	auto* metadata_node = root->find("./opf:metadata", ns_map)[0];
 	for (auto&& c : metadata_node->find("./dc:creator", ns_map)) {
-		printf("Removing child %s\n", c->get_name().c_str());
+		spdlog::debug("Removing child {}", c->get_name().c_str());
 		xmlpp::Node::remove_node(c);
 	}
 	for (auto&& a : authors) {
@@ -128,7 +129,7 @@ void EpubBook::set_title(const std::string& title) {
 	auto* root = xml_doc->get_root_node();
 	auto* metadata_node = root->find("./opf:metadata", ns_map)[0];
 	for (auto&& c : metadata_node->find("./dc:title", ns_map)) {
-		// printf("Removing child %s\n", c->get_name().c_str());
+		spdlog::debug("Removing child {}", c->get_name().c_str());
 		xmlpp::Node::remove_node(c);
 	}
 	auto* new_node = static_cast<xmlpp::Element*>(metadata_node)->add_child_element("title", "dc");
@@ -140,26 +141,26 @@ void EpubBook::set_filename(const fs::path& filename) { file_name = filename; }
 void EpubBook::write_to_disk() {
 	std::string content = xml_doc->write_to_string();
 	if (content.length() == 0) {
-		printf("Empty xml content!\n");
+		spdlog::error("Empty xml content!\n");
 		std::exit(-1);
 	}
 	auto* zstat = (zip_stat_t*)malloc(sizeof(zip_stat_t));
 	if (-1 == zip_stat(epub_file, content_opf_path.string().c_str(), 0, zstat)) {
-		printf("Error while reading opf file stats.");
+		spdlog::error("Error while reading opf file stats.");
 		std::exit(-1);
 	}
 	zip_source_t* src = zip_source_buffer(epub_file, content.c_str(), content.length(), 0);
 	if (src == nullptr) {
-		printf("Error while creating source buffer: %s\n", zip_strerror(epub_file));
+		spdlog::error("Error while creating source buffer: %s\n", zip_strerror(epub_file));
 		std::exit(-1);
 	}
 	if (-1 == zip_file_replace(epub_file, zstat->index, src, 0)) {
-		printf("Error while replacing file: %s\n", zip_strerror(epub_file));
+		spdlog::error("Error while replacing file: %s\n", zip_strerror(epub_file));
 		std::exit(-1);
 	}
 	zip_fclose(content_opf_file);
 	if (-1 == zip_close(epub_file)) {
-		printf("Error while closing epub file: %s.", zip_strerror(epub_file));
+		spdlog::error("Error while closing epub file: %s.", zip_strerror(epub_file));
 		std::exit(-1);
 	}
 	// If filename changed move rename the file to new name. Dont bother creating

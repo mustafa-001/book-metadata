@@ -16,19 +16,20 @@ find_package(fmt CONFIG REQUIRED)
 message("libxmlpp include dir "  ${LIBXMLPP_INCLUDE_DIR})
 # message("djvu" ${DJVU_LIB}) 
 add_definitions(-DHAVE_PTHREAD -DHAVE_STDINT_H -DHAS_MBSTATE -DHAVE_NAMESPACES)
-target_link_libraries(book-metadata  djvu)
-
 add_definitions(-D_UNICODE)
+
 target_include_directories(book-metadata PUBLIC ${DJVU_INCLUDE_DIR} )
 
-target_link_libraries(book-metadata  libzip::zip)
+target_link_libraries(book-metadata PRIVATE  libzip::zip djvu)
 
 #HACK
 include_directories(${LIBXMLPP_INCLUDE_DIR}/libxml++-5.0/)
 
+find_package(spdlog CONFIG REQUIRED)
+target_link_libraries(book-metadata PRIVATE spdlog::spdlog spdlog::spdlog_header_only)
+
 target_include_directories(book-metadata PRIVATE ${LIBPODOFO_INCLUDE_DIR})
 target_include_directories(book-metadata PRIVATE ${LIBXMLPP_INCLUDE_DIR})
-target_link_libraries(book-metadata ${LIBPODOFO_LIBRARY})
-target_compile_options(book-metadata PRIVATE "/utf-8")
-target_link_libraries(book-metadata fmt::fmt)
-target_link_libraries(book-metadata ${Boost_LIBRARIES} ${LIBXMLPP})
+target_link_libraries(book-metadata PRIVATE ${LIBPODOFO_LIBRARY})
+target_link_libraries(book-metadata PRIVATE fmt::fmt)
+target_link_libraries(book-metadata PRIVATE ${Boost_LIBRARIES} ${LIBXMLPP})
