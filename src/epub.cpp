@@ -106,6 +106,7 @@ auto EpubBook::get_authors() -> std::vector<std::string> {
 void EpubBook::set_authors(const std::vector<std::string>& authors) {
 	auto* root = xml_doc->get_root_node();
 	auto* metadata_node = root->find("./opf:metadata", ns_map)[0];
+	root->set_namespace_declaration("http://www.idpf.org/2007/opf", "opf");
 	for (auto&& c : metadata_node->find("./dc:creator", ns_map)) {
 		spdlog::debug("Removing child {}", c->get_name().c_str());
 		xmlpp::Node::remove_node(c);
@@ -127,6 +128,7 @@ auto EpubBook::get_title() -> std::string {
 
 void EpubBook::set_title(const std::string& title) {
 	auto* root = xml_doc->get_root_node();
+	root->set_namespace_declaration("http://www.idpf.org/2007/opf", "opf");
 	auto* metadata_node = root->find("./opf:metadata", ns_map)[0];
 	for (auto&& c : metadata_node->find("./dc:title", ns_map)) {
 		spdlog::debug("Removing child {}", c->get_name().c_str());
