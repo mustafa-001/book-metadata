@@ -141,8 +141,8 @@ void EpubBook::set_title(const std::string& title) {
 void EpubBook::set_filename(const fs::path& filename) { file_name = filename; }
 
 void EpubBook::write_to_disk() {
-	std::string content = xml_doc->write_to_string();
-	if (content.length() == 0) {
+	std::string serialized_output = xml_doc->write_to_string();
+	if (serialized_output.length() == 0) {
 		spdlog::error("Empty xml content!\n");
 		std::exit(-1);
 	}
@@ -151,18 +151,18 @@ void EpubBook::write_to_disk() {
 		spdlog::error("Error while reading opf file stats.");
 		std::exit(-1);
 	}
-	zip_source_t* src = zip_source_buffer(epub_file, content.c_str(), content.length(), 0);
+	zip_source_t* src = zip_source_buffer(epub_file, serialized_output.c_str(), serialized_output.length(), 0);
 	if (src == nullptr) {
 		spdlog::error("Error while creating source buffer: %s\n", zip_strerror(epub_file));
 		std::exit(-1);
 	}
 	if (-1 == zip_file_replace(epub_file, zstat->index, src, 0)) {
-		spdlog::error("Error while replacing file: %s\n", zip_strerror(epub_file));
+		spdlog::error("Error while replacing file: {}", zip_strerror(epub_file));
 		std::exit(-1);
 	}
 	zip_fclose(content_opf_file);
 	if (-1 == zip_close(epub_file)) {
-		spdlog::error("Error while closing epub file: %s.", zip_strerror(epub_file));
+		spdlog::error("Error while closing epub file: {}.", zip_strerror(epub_file));
 		std::exit(-1);
 	}
 	// If filename changed move rename the file to new name. Dont bother creating

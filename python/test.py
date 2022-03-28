@@ -53,7 +53,7 @@ def test_write_author(ext):
             )
             for _ in range(10)
         )
-        subprocess.run([executable, "--verbose", "--cauthor", rand_str, i.path])
+        subprocess.run([executable, "--verbose", "--cauthor", rand_str, path])
         res = subprocess.run([executable, "--author", path], stdout=subprocess.PIPE)
         if res.stdout.decode("utf-8").rstrip() == rand_str:
             print("Success \n")
@@ -69,5 +69,5 @@ def test_write_author(ext):
 
 
        
-test_write_author("epub")
+test_write_author("pdf")
 #test_read("djvu")
