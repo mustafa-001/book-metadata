@@ -4,6 +4,8 @@
 
 /.idea
 /.vs
+/.cache
+/compile_commands.json
 /books
 /build
 /cmake-build-debug-mingw
