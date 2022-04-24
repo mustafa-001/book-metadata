@@ -21,24 +21,18 @@ INTERFACE_LINK_LIBRARIES "OpenSSL::Crypto;${JPEG_LIBRARIES};freetype"
 find_package(libzip CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 add_definitions(-DHAVE_PTHREAD -DHAVE_STDINT_H -DHAS_MBSTATE -DHAVE_NAMESPACES)
 target_include_directories(book-metadata PUBLIC ${DJVU_INCLUDE_DIR} )
 
-target_link_libraries(book-metadata PRIVATE  libzip::zip djvu)
-
-find_package(spdlog CONFIG REQUIRED)
-target_link_libraries(book-metadata PRIVATE spdlog::spdlog spdlog::spdlog_header_only)
 
 #vcpkg's libxmlpp doesn't export proper libxmlpp-config.cmake module, when linking static
 #(default on linux) dependencies doesnt added to build. This creates a TARGET and defines necessary 
 #interface paramaters.
 #TODO Move this to it's own FindPackage.cmake
 find_path(LIBXMLPP_INCLUDE_DIR libxml++-5.0/libxml++/document.h REQUIRED)
-set(CMAKE_FIND_DEBUG_MODE on)
 find_path(LIBXMLPP_CONFIG_H  libxml++config.h  PATH_SUFFIXES lib/libxml++-5.0/include REQUIRED NOCACHE)
-message("libxmlpp config h" ${LIBXMLPP_CONFIG_H})
-set(CMAKE_FIND_DEBUG_MODE off)
 find_library(LIBXMLPP xml++-5.0.lib libxml++-5.0.a REQUIRED)
 #HACK
 include_directories(${LIBXMLPP_INCLUDE_DIR}/libxml++-5.0/)
@@ -49,9 +43,11 @@ IMPORTED_LOCATION "${LIBXMLPP}"
 INTERFACE_INCLUDE_DIRECTORIES "${LIBXMLPP_INCLUDE_DIR};${LIBXMLPP_CONFIG_H}"
 INTERFACE_LINK_LIBRARIES  LibXml2::LibXml2) 
 
-# target_include_directories(book-metadata PRIVATE ${LIBPODOFO_INCLUDE_DIR})
-# target_include_directories(book-metadata PRIVATE ${LIBXMLPP_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(book-metadata PRIVATE LIBXMLPP::LIBXMLPP podofo::podofo)
-# target_link_libraries(book-metadata PRIVATE ${LIBPODOFO_LIBRARY})
-# target_link_libraries(book-metadata PRIVATE fmt::fmt)
-target_link_libraries(book-metadata PRIVATE ${Boost_LIBRARIES} fmt::fmt)
+target_link_libraries(book-metadata PRIVATE LIBXMLPP::LIBXMLPP 
+                                            spdlog::spdlog
+                                            spdlog::spdlog_header_only
+                                            libzip::zip
+                                            djvu
+                                            podofo::podofo 
+                                            ${Boost_LIBRARIES} 
+                                            fmt::fmt)
