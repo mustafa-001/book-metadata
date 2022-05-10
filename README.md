@@ -16,7 +16,7 @@ Author 2
 
 
 - Set up cmake and vcpkg.(https://vcpkg.io/en/getting-started.html)
-- Inttall podofo, libxml, zip and boost::program_options.
+- Install podofo, libxml, zip and boost::program_options.
 
 ```
 vcpkg install podofo libxmlpp zlib boost-program-options
